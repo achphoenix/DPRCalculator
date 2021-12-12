@@ -1,92 +1,115 @@
 <html>
-    <head> 
+    <head>
         <meta charset="utf-8">
         <title>Firebirb</title>
     </head>
 
     <body onload="PageLoad()">
-        <h1>Unga Bunga Unga Bunga</h1>
-        <span class="Rainbow" id="TheRainbowParagraph" onmouseover="Rainbow();">Firebird Suite.</span>
+        <h1>DPR Calculator</h1>
+        <div id="TheBox">
+            <h3>Inputs:</h3>
+            <span>Hit Chance:</span> 
+            <br>
+            <span>Enemy ac:</span>
+            <input type="number" id="EnemyAC" onchange="CalculateDPR();" value="10">
+            <br>
+            <span>Bonus to hit:</span>
+            <input type="number" id="BonusToHit" onchange="CalculateDPR();" value="0">
+            <br> <br>
+            <span>Attack:</span>
+            <br>
+            <span>No. of attacks:</span>
+            <input type="number" id="NoOfAttacks" onchange="CalculateDPR();" value="1">
+            <br>
+            <span>No. of Dice:</span>
+            <input type="number" id="NoOfDice" onchange="CalculateDPR();" value="1">
+            <br>
+            <span>Dice size:</span>
+            <select id="AttackDice" class="DiceSelector" onchange="CalculateDPR();">
+                <option value="4">D4</option>
+                <option value="6">D6</option>
+                <option value="8">D8</option>
+                <option value="10">D10</option>
+                <option value="12">D12</option>
+                <option value="14">D14</option>
+                <option value="16">D16</option>
+                <option value="18">D18</option>
+                <option value="20">D20</option>
+            </select>
+            <br>
+            <span>Resistant?:</span>
+            <input type="checkbox" id="Resistant" onchange="CalculateDPR();">
+
+
+            <br> <br> <br> <br> <br>
+            <span>Result:</span>
+            <br>
+            <span id="Result">0</span>
+        </div>
     </body>
 </html>
 
 <script>
-    // Global
-    var oldColorNumber;
-    
-    // Global End
 
 function PageLoad()
 {
     
 }
 
-function Rainbow(event)
+function CalculateDPR()
+{
+    var enemyAc = parseInt(document.getElementById("EnemyAC").value);
+    var bonusToHit = parseInt(document.getElementById("BonusToHit").value);
+    var noOfAttacks = parseInt(document.getElementById("NoOfAttacks").value); // todo: get from class name clusters
+    var noOfDice = parseInt(document.getElementById("NoOfDice").value);
+    var diceSize = parseInt(document.getElementById("AttackDice").value);
+    var resistant = document.getElementById("Resistant").checked;
+    var hitChance = 0;
+    var avgDamage = 0;
+    var finalResult = 0;
+
+    var hitMod = bonusToHit + 21 - enemyAc;
+
+    switch(true) // todo: add crit support
     {
-        var targetElement = document.getElementById("TheRainbowParagraph");
-
-        var colorNumber = Math.floor(Math.random() * 11);
-        while (oldColorNumber == colorNumber)
-        {
-            var colorNumber = Math.floor(Math.random() * 11);
-        }
-
-        switch(colorNumber)
-        {
-            case 0:
-            targetElement.style.color = "darkred";
+        case (hitMod < 1):
+        hitChance = 0;
             break;
-            case 1:
-            targetElement.style.color = "red";
+        case (hitMod > 19):
+        hitChance = 100;
             break;
-            case 2:
-            targetElement.style.color = "chocolate";
+        default:
+        hitChance = hitMod * 5;
             break;
-            case 3:
-            targetElement.style.color = "gold";
-            break;
-            case 4:
-            targetElement.style.color = "greenYellow";
-            break;
-            case 5:
-            targetElement.style.color = "lawnGreen";
-            break;
-            case 6:
-            targetElement.style.color = "green";
-            break;
-            case 7:
-            targetElement.style.color = "mediumturquise";
-            break;
-            case 8:
-            targetElement.style.color = "royalblue";
-            break;
-            case 9:
-            targetElement.style.color = "slateblue";
-            break;
-            case 10:
-            targetElement.style.color = "purple";
-            colorNumber = 1;
-            break;
-            default:
-            targetElement.style.color = "black";
-            break;
-        }
-
-        oldColorNumber = colorNumber;
     }
+
+    avgDamage = ((diceSize + 1) / 2) * noOfDice * noOfAttacks;
+    if(resistant === true)
+    {
+        avgDamage = avgDamage / 2;
+    }
+
+    finalResult = (avgDamage * (hitChance / 100)).toFixed(2);
+
+    document.getElementById("Result").textContent = finalResult.toString();
+}
+
 </script>
 
 <style>
 
-h1 {
-    text-align: center;
-    font-family: "Source Sans Pro", sans-serif;
-    font-weight: normal;
-}
+    body {
+        background-color: lightgray;
+    }
 
-.Rainbow{
-    display:table;
-    margin:0 auto;
-    font-size: 24px;
-}
+    h1 {
+        text-align: center;
+        font-family: "Source Sans Pro", sans-serif;
+        font-weight: normal;
+    }
+
+    #TheBox{
+        display: table;
+        margin: 0 auto;
+    }
 </style>
