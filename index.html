@@ -11,15 +11,25 @@
             <span>Hit Chance:</span> 
             <br>
             <span>Enemy ac:</span>
-            <input type="number" id="EnemyAC" onchange="CalculateDPR();" value="10">
+            <input type="number" id="EnemyAC" onchange="CalculateDPR();" value="12">
             <br>
             <span>Bonus to hit:</span>
-            <input type="number" id="BonusToHit" onchange="CalculateDPR();" value="0">
+            <input type="number" id="BonusToHit" onchange="CalculateDPR();" value="5">
+            <br>
+            <span>Crit Threshhold:</span>
+            <select id="CritThreshold" class="DiceSelector" onchange="CalculateDPR();">
+                <option value="5">D20</option>
+                <option value="10">D19</option>
+                <option value="15">D18</option>
+                <option value="20">D17</option>
+                <option value="25">D16</option>
+                <option value="30">D15</option>
+            </select>
             <br> <br>
             <span>Attack:</span>
             <br>
             <span>No. of attacks:</span>
-            <input type="number" id="NoOfAttacks" onchange="CalculateDPR();" value="1">
+            <input type="number" id="NoOfAttacks" onchange="CalculateDPR();" min="1" value="1">
             <br>
             <span>No. of Dice:</span>
             <input type="number" id="NoOfDice" onchange="CalculateDPR();" value="1">
@@ -37,6 +47,9 @@
                 <option value="20">D20</option>
             </select>
             <br>
+            <span>Bonus Damage:</span>
+            <input type="number" id="BonusDamage" onchange="CalculateDPR();" value="0">
+            <br>
             <span>Resistant?:</span>
             <input type="checkbox" id="Resistant" onchange="CalculateDPR();">
 
@@ -44,7 +57,9 @@
             <br> <br> <br> <br> <br>
             <span>Result:</span>
             <br>
-            <span id="Result">0</span>
+            <span>Chance to hit: </span><span id="ResultChance">0%</span>
+            <br>
+            <span>Average Damage per Round: </span><span id="ResultAvgDamage">0</span>
         </div>
     </body>
 </html>
@@ -60,9 +75,11 @@ function CalculateDPR()
 {
     var enemyAc = parseInt(document.getElementById("EnemyAC").value);
     var bonusToHit = parseInt(document.getElementById("BonusToHit").value);
+    var critThreshold = parseInt(document.getElementById("CritThreshold").value);
     var noOfAttacks = parseInt(document.getElementById("NoOfAttacks").value); // todo: get from class name clusters
     var noOfDice = parseInt(document.getElementById("NoOfDice").value);
     var diceSize = parseInt(document.getElementById("AttackDice").value);
+    var bonusDamage = parseInt(document.getElementById("BonusDamage").value);
     var resistant = document.getElementById("Resistant").checked;
     var hitChance = 0;
     var avgDamage = 0;
@@ -73,17 +90,17 @@ function CalculateDPR()
     switch(true) // todo: add crit support
     {
         case (hitMod < 1):
-        hitChance = 0;
+        hitChance = 5;
             break;
         case (hitMod > 19):
-        hitChance = 100;
+        hitChance = 95;
             break;
         default:
         hitChance = hitMod * 5;
             break;
     }
 
-    avgDamage = ((diceSize + 1) / 2) * noOfDice * noOfAttacks;
+    avgDamage = ((((diceSize + 1) / 2) * noOfDice) + bonusDamage) * noOfAttacks * (1 + (critThreshold/100));
     if(resistant === true)
     {
         avgDamage = avgDamage / 2;
@@ -91,7 +108,8 @@ function CalculateDPR()
 
     finalResult = (avgDamage * (hitChance / 100)).toFixed(2);
 
-    document.getElementById("Result").textContent = finalResult.toString();
+    document.getElementById("ResultChance").textContent = hitChance.toString() + "%";
+    document.getElementById("ResultAvgDamage").textContent = finalResult.toString();
 }
 
 </script>
